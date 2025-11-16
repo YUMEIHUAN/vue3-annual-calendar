@@ -1,5 +1,48 @@
 <template>
-  <!-- 你的 template 代码保持不变 -->
+  <div id="app">
+    <div class="calendar-container">
+      <div class="batch-selector">
+        <h3>批量选择休息日</h3>
+        <div class="weekday-checkboxes">
+          <el-checkbox-group v-model="selectedWeekdays" @change="handleWeekdayChange">
+            <el-checkbox :label="1">周一休息</el-checkbox>
+            <el-checkbox :label="2">周二休息</el-checkbox>
+            <el-checkbox :label="3">周三休息</el-checkbox>
+            <el-checkbox :label="4">周四休息</el-checkbox>
+            <el-checkbox :label="5">周五休息</el-checkbox>
+            <el-checkbox :label="6">周六休息</el-checkbox>
+            <el-checkbox :label="0">周日休息</el-checkbox>
+          </el-checkbox-group>
+          <div class="selected-info">已选择: {{ getSelectedWeekdaysText }}</div>
+        </div>
+      </div>
+
+      <div class="calendar-grid">
+        <div v-for="month in months" :key="month" class="month-card">
+          <div class="month-header">{{ selectedYear }}年{{ month }}月</div>
+          <div class="calendar">
+            <div class="weekdays">
+              <div v-for="day in weekdays" :key="day">{{ day }}</div>
+            </div>
+            <div class="days">
+              <div v-for="(day, index) in getMonthDays(month)" :key="index" class="day" :class="{
+                'other-month': !day.isCurrentMonth,
+                selected: isSelected(day.date),
+                today: isToday(day.date),
+              }" @click="toggleHoliday(day)">
+                {{ day.isCurrentMonth ? day.day : '' }}
+                <div v-if="isSelected(day.date)" class="selected-indicator">休</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>Element UI + Vue3 年度节假日日历 - 点击日期可标记为节假日，支持批量选择</p>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -13,25 +56,17 @@ export default {
     ElCheckboxGroup,
   },
   props: {
-    // 年份
     year: {
       type: Number,
       default: () => new Date().getFullYear()
     },
-    // 初始节假日
     initialHolidays: {
       type: Array,
       default: () => []
     },
-    // 是否显示批量选择器
     showBatchSelector: {
       type: Boolean,
       default: true
-    },
-    // 自定义样式
-    customStyles: {
-      type: Object,
-      default: () => ({})
     }
   },
   emits: ['holiday-change', 'update:year'],
@@ -42,12 +77,19 @@ export default {
     const selectedHolidays = ref([...props.initialHolidays])
     const selectedWeekdays = ref([])
 
+    // 用于跟踪哪些日期是通过批量选择添加的
+    const batchSelectedDates = ref(new Set())
+
     const weekdays = ['日', '一', '二', '三', '四', '五', '六']
     const months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 
     // 监听年份变化
     watch(() => props.year, (newYear) => {
       selectedYear.value = newYear
+      // 年份变化时重新应用批量选择
+      if (selectedWeekdays.value.length > 0) {
+        applyWeekdaySelection()
+      }
     })
 
     // 监听节假日变化
@@ -140,8 +182,12 @@ export default {
           date: dateString,
           name: `${selectedYear.value}年${day.date.getMonth() + 1}月${day.date.getDate()}日`,
         })
+        // 如果是手动添加的，从批量选择集合中移除（如果是批量选择添加的）
+        batchSelectedDates.value.delete(dateString)
       } else {
         selectedHolidays.value.splice(index, 1)
+        // 如果是从批量选择中移除的，也从集合中移除
+        batchSelectedDates.value.delete(dateString)
       }
     }
 
@@ -153,36 +199,35 @@ export default {
       return `${year}-${month}-${day}`
     }
 
-    // 处理星期选择变化
-    const handleWeekdayChange = () => {
+    // 应用星期选择
+    const applyWeekdaySelection = () => {
       const year = selectedYear.value
       const currentSelectedWeekdays = [...selectedWeekdays.value]
 
-      // 移除当前年份中所有通过批量选择设置的日期
+      // 首先移除当前年份中所有通过批量选择设置的日期
       selectedHolidays.value = selectedHolidays.value.filter((holiday) => {
         const holidayYear = parseInt(holiday.date.split('-')[0])
+        // 如果不是当前年份，保留
         if (holidayYear !== year) return true
 
+        // 如果是固定节假日，保留
+        if (isFixedHoliday(holiday.date, year)) {
+          return true
+        }
+
+        // 如果是手动选择且不在批量选择集合中的，保留
+        if (!batchSelectedDates.value.has(holiday.date)) {
+          return true
+        }
+
+        // 其他批量选择的日期，根据当前选择的星期决定是否保留
         const holidayDate = new Date(holiday.date)
         const holidayWeekday = holidayDate.getDay()
-
-        if (currentSelectedWeekdays.includes(holidayWeekday)) {
-          return true
-        }
-
-        // 检查是否是手动选择的固定节假日
-        const fixedHolidays = [
-          `${year}-01-01`,
-          `${year}-05-01`,
-          `${year}-10-01`,
-        ]
-
-        if (fixedHolidays.includes(holiday.date)) {
-          return true
-        }
-
-        return false
+        return currentSelectedWeekdays.includes(holidayWeekday)
       })
+
+      // 清空批量选择集合，准备重新添加
+      batchSelectedDates.value.clear()
 
       // 添加新选择的星期的休息日
       if (currentSelectedWeekdays.length > 0) {
@@ -195,13 +240,28 @@ export default {
         while (currentDate <= endDate) {
           if (currentSelectedWeekdays.includes(currentDate.getDay())) {
             const dateString = formatDate(currentDate)
+
+            // 跳过固定节假日
+            if (isFixedHoliday(dateString, year)) {
+              currentDate.setDate(currentDate.getDate() + 1)
+              continue
+            }
+
+            // 检查是否已经存在
             const exists = selectedHolidays.value.some((h) => h.date === dateString)
             if (!exists) {
               selectedHolidays.value.push({
                 date: dateString,
                 name: `${year}年${currentDate.getMonth() + 1}月${currentDate.getDate()}日`,
               })
+              // 标记为批量选择添加的日期
+              batchSelectedDates.value.add(dateString)
               addedCount++
+            } else {
+              // 如果已经存在且不是固定节假日，标记为批量选择
+              if (!isFixedHoliday(dateString, year)) {
+                batchSelectedDates.value.add(dateString)
+              }
             }
           }
           currentDate.setDate(currentDate.getDate() + 1)
@@ -218,10 +278,25 @@ export default {
       }
     }
 
+    // 检查是否为固定节假日
+    const isFixedHoliday = (dateString, year) => {
+      const fixedHolidays = [
+        `${year}-01-01`, // 元旦
+        `${year}-05-01`, // 劳动节
+        `${year}-10-01`, // 国庆节
+      ]
+      return fixedHolidays.includes(dateString)
+    }
+
+    // 处理星期选择变化
+    const handleWeekdayChange = () => {
+      applyWeekdaySelection()
+    }
+
     // 清除批量选择的星期几休息日
     const clearWeekdaySelection = () => {
       selectedWeekdays.value = []
-      handleWeekdayChange()
+      applyWeekdaySelection()
     }
 
     // 初始化一些节假日
@@ -257,7 +332,207 @@ export default {
   },
 }
 </script>
-
 <style scoped>
-/* 你的样式代码保持不变 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', Arial, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
+  color: #333;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.calendar-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 25px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 25px;
+}
+
+.month-card {
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.month-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.month-header {
+  background: linear-gradient(135deg, #409eff 0%, #66b1ff 100%);
+  color: white;
+  padding: 12px 15px;
+  font-weight: 600;
+  text-align: center;
+  font-size: 16px;
+}
+
+.calendar {
+  padding: 15px;
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 13px;
+  color: #909399;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.day {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  position: relative;
+  border: 1px solid transparent;
+}
+
+.day:hover {
+  background-color: #f0f7ff;
+  border-color: #c6e2ff;
+}
+
+.day.other-month {
+  color: transparent;
+  background-color: transparent;
+  cursor: default;
+}
+
+.day.other-month:hover {
+  background-color: transparent;
+  border-color: transparent;
+  cursor: default;
+}
+
+.day.selected {
+  background: linear-gradient(135deg, #f56c6c 0%, #f78989 100%);
+  color: white;
+  box-shadow: 0 2px 6px rgba(245, 108, 108, 0.3);
+  font-weight: bold;
+}
+
+.day.other-month.selected {
+  background: transparent;
+  color: #c0c4cc;
+  box-shadow: none;
+}
+
+.day.today.other-month {
+  border: none;
+  background-color: transparent;
+}
+
+.day.today {
+  border: 2px solid #409eff;
+  background-color: #ecf5ff;
+}
+
+.selected-indicator {
+  position: absolute;
+  top: 0;
+  right: 2px;
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+}
+
+.footer {
+  margin-top: 25px;
+  text-align: center;
+  color: #909399;
+  font-size: 14px;
+}
+
+.batch-selector {
+  margin: 25px 0;
+  padding: 20px;
+  border: 1px solid #ebeef5;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+}
+
+.batch-selector h3 {
+  margin-bottom: 15px;
+  color: #409eff;
+  font-size: 18px;
+}
+
+.weekday-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.selected-info {
+  padding: 8px 12px;
+  background: #e6f7ff;
+  border: 1px solid #91d5ff;
+  border-radius: 4px;
+  color: #1890ff;
+  font-size: 14px;
+}
+
+/* Element Plus 复选框样式调整 */
+:deep(.el-checkbox-group) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+:deep(.el-checkbox) {
+  margin-right: 0;
+}
+
+@media (max-width: 1200px) {
+  .calendar-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .calendar-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  :deep(.el-checkbox-group) {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .calendar-grid {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
