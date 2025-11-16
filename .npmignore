@@ -1,0 +1,8 @@
+node_modules
+src
+vite.config.js
+*.local
+.DS_Store
+*.log
+.git
+.github

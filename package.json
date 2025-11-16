@@ -1,0 +1,41 @@
+{
+  "name": "vue3-annual-calendar",
+  "version": "1.0.0",
+  "description": "A beautiful annual calendar component for Vue 3 with holiday selection features",
+  "main": "dist/vue3-annual-calendar.umd.js",
+  "module": "dist/vue3-annual-calendar.es.js",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "vue3",
+    "calendar",
+    "holiday",
+    "component",
+    "element-plus"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/972432992@qq.com/vue3-annual-calendar"
+  },
+  "bugs": {
+    "url": "https://github.com/972432992@qq.com/vue3-annual-calendar/issues"
+  },
+  "homepage": "https://github.com/972432992@qq.com/vue3-annual-calendar#readme",
+  "peerDependencies": {
+    "vue": "^3.0.0",
+    "element-plus": "^2.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.0.0",
+    "vite": "^4.0.0"
+  }
+}
