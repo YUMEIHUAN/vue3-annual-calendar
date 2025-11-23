@@ -24,12 +24,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/972432992@qq.com/vue3-annual-calendar"
+    "url": "https://github.com/YUMEIHUAN/vue3-annual-calendar.git"
   },
   "bugs": {
     "url": "https://github.com/972432992@qq.com/vue3-annual-calendar/issues"
   },
-  "homepage": "https://github.com/972432992@qq.com/vue3-annual-calendar#readme",
+  "homepage": "https://github.com/YUMEIHUAN/vue3-annual-calendar.git",
   "peerDependencies": {
     "vue": "^3.0.0",
     "element-plus": "^2.0.0"
