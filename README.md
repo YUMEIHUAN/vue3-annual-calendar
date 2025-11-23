@@ -8,53 +8,125 @@
 npm install vue3-annual-calendar
 ```
 
-## 使用
+## 测试
+
 ```javascript
 <template>
   <AnnualCalendar
-    v-model:year="currentYear"
-    :initial-holidays="holidays"
-    :show-batch-selector="true"
-    @holiday-change="handleHolidayChange"
-  />
+      :year="currentYear"
+      :initial-holidays="initialHolidays"
+      :show-batch-selector="true"
+      @year-change="handleYearChange"
+      @holiday-change="handleHolidayChange"
+      ref="calendarRef"
+    />
+
+    <div
+      style="display: flex; justify-content: end; gap: 10px; margin-top: 20px; margin-bottom: 20px"
+    >
+      <el-button @click="changeYear" type="primary">切换到2026年</el-button>
+      <el-button @click="setCustomHolidays" type="primary">设置自定义休息日</el-button>
+      <el-button @click="getCurrentHolidays" type="primary">获取当前休息日</el-button>
+      <el-button @click="getHolidayData" type="primary">获取数据结构</el-button>
+    </div>
 </template>
 
-<script>
+<script setup>
 import { ref } from 'vue'
 import { AnnualCalendar } from 'vue3-annual-calendar'
 import 'vue3-annual-calendar/dist/style.css'
 
-export default {
-  components: {
-    AnnualCalendar
-  },
-  setup() {
-    const currentYear = ref(2024)
-    const holidays = ref([
-      { date: '2024-01-01', name: '元旦' },
-      { date: '2024-05-01', name: '劳动节' }
-    ])
+const currentYear = ref(2025)
+const calendarRef = ref()
 
-    const handleHolidayChange = (newHolidays) => {
-      console.log('节假日变化:', newHolidays)
-    }
+const initialHolidays = ['2025-01-01', '2025-02-10', '2025-02-11', '2025-05-01']
 
-    return {
-      currentYear,
-      holidays,
-      handleHolidayChange
-    }
-  }
+const handleYearChange = (year) => {
+  console.log('年份变化:', year)
+  currentYear.value = year
+}
+
+const handleHolidayChange = (holidays) => {
+  console.log('休息日变化:', holidays)
+}
+
+const changeYear = () => {
+  currentYear.value = 2026
+}
+
+const setCustomHolidays = () => {
+  const customHolidays = ['2025-06-01', '2025-07-15', '2025-08-20']
+  calendarRef.value.setHolidays(customHolidays)
+}
+
+const getCurrentHolidays = () => {
+  const holidays = calendarRef.value.getSelectedHolidays()
+  console.log('当前休息日:', holidays)
+}
+const getHolidayData = () => {
+  const holidayData = calendarRef.value.getHolidayData()
+  console.log('假期数据:', holidayData)
 }
 </script>
 ```
 
+```
+<template>
+  <div>
+    <AnnualCalendar
+      :year="currentYear"
+      :initial-holidays="initialHolidays"
+      :show-batch-selector="true"
+      @year-change="handleYearChange"
+      @holiday-change="handleHolidayChange"
+      ref="calendarRef"
+    />
 
-Props
-属性	类型	默认值	说明
-year	Number	当前年份	显示的年份
-initialHolidays	Array	[]	初始节假日数组
-showBatchSelector	Boolean	true	是否显示批量选择器
-Events
-事件名	参数	说明
-holiday-change	holidays	节假日变化时触发
+    <div
+      style="display: flex; justify-content: end; gap: 10px; margin-top: 20px; margin-bottom: 20px"
+    >
+      <el-button @click="changeYear" type="primary">切换到2026年</el-button>
+      <el-button @click="setCustomHolidays" type="primary">设置自定义休息日</el-button>
+      <el-button @click="getCurrentHolidays" type="primary">获取当前休息日</el-button>
+      <el-button @click="getHolidayData" type="primary">获取数据结构</el-button>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import AnnualCalendar from '@/components/views/views/removalDetail.vue'
+
+const currentYear = ref(2025)
+const calendarRef = ref()
+
+const initialHolidays = ['2025-01-01', '2025-02-10', '2025-02-11', '2025-05-01']
+
+const handleYearChange = (year) => {
+  console.log('年份变化:', year)
+  currentYear.value = year
+}
+
+const handleHolidayChange = (holidays) => {
+  console.log('休息日变化:', holidays)
+}
+
+const changeYear = () => {
+  currentYear.value = 2026
+}
+
+const setCustomHolidays = () => {
+  const customHolidays = ['2025-06-01', '2025-07-15', '2025-08-20']
+  calendarRef.value.setHolidays(customHolidays)
+}
+
+const getCurrentHolidays = () => {
+  const holidays = calendarRef.value.getSelectedHolidays()
+  console.log('当前休息日:', holidays)
+}
+const getHolidayData = () => {
+  const holidayData = calendarRef.value.getHolidayData()
+  console.log('假期数据:', holidayData)
+}
+</script>
+```
