@@ -1,38 +1,38 @@
-import { ref as w, computed as P, watch as W, onMounted as Q, resolveComponent as k, openBlock as f, createElementBlock as h, createElementVNode as r, Fragment as H, renderList as x, createBlock as X, createVNode as m, withCtx as D, createTextVNode as M, toDisplayString as Y, normalizeClass as Z, createCommentVNode as ee } from "vue";
+import { ref as w, computed as P, watch as U, onMounted as Q, resolveComponent as k, openBlock as h, createElementBlock as _, createElementVNode as d, Fragment as x, renderList as M, createBlock as X, createVNode as m, withCtx as D, createTextVNode as V, toDisplayString as Y, normalizeClass as Z, createCommentVNode as ee } from "vue";
 import { ElMessage as B } from "element-plus";
-function te(o = (/* @__PURE__ */ new Date()).getFullYear(), p = {}) {
-  const s = String(o), i = [], y = new Date(s, 0, 1), v = new Date(s, 11, 31), d = new Date(y);
-  for (; d <= v; ) {
-    const l = String(d.getMonth() + 1).padStart(2, "0"), g = String(d.getDate()).padStart(2, "0"), V = `${l}-${g}`, I = d.getDay();
-    let F = !1;
-    i.push({
-      date: V,
-      isHoliday: F,
-      weekday: I
-    }), d.setDate(d.getDate() + 1);
+function te(o = (/* @__PURE__ */ new Date()).getFullYear(), g = {}) {
+  const s = String(o), c = [], y = new Date(s, 0, 1), v = new Date(s, 11, 31), r = new Date(y);
+  for (; r <= v; ) {
+    const l = String(r.getMonth() + 1).padStart(2, "0"), f = String(r.getDate()).padStart(2, "0"), I = `${l}-${f}`, E = r.getDay();
+    let C = !1;
+    c.push({
+      date: I,
+      isHoliday: C,
+      weekday: E
+    }), r.setDate(r.getDate() + 1);
   }
   return {
     year: s,
-    days: i
+    days: c
   };
 }
 function S(o = /* @__PURE__ */ new Date()) {
-  const p = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], s = o.getFullYear(), i = o.getMonth(), y = o.getDate();
-  (s % 4 === 0 && s % 100 !== 0 || s % 400 === 0) && (p[1] = 29);
-  let d = y;
-  for (let l = 0; l < i; l++)
-    d += p[l];
-  return d;
+  const g = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], s = o.getFullYear(), c = o.getMonth(), y = o.getDate();
+  (s % 4 === 0 && s % 100 !== 0 || s % 400 === 0) && (g[1] = 29);
+  let r = y;
+  for (let l = 0; l < c; l++)
+    r += g[l];
+  return r;
 }
-const ae = (o, p) => {
+const ae = (o, g) => {
   const s = o.__vccOpts || o;
-  for (const [i, y] of p)
-    s[i] = y;
+  for (const [c, y] of g)
+    s[c] = y;
   return s;
-}, le = { class: "calendar-container" }, ne = { class: "batch-selector" }, oe = { style: { display: "flex", "justify-content": "space-between" } }, se = { class: "weekday-checkboxes" }, re = { class: "calendar-grid" }, de = { class: "month-header" }, ie = { class: "calendar" }, ce = { class: "weekdays" }, ue = { class: "days" }, ye = ["onClick"], ve = {
+}, le = { class: "calendar-container" }, ne = { class: "batch-selector" }, oe = { style: { display: "flex", "justify-content": "space-between" } }, se = { class: "weekday-checkboxes" }, de = { class: "calendar-grid" }, re = { class: "month-header" }, ce = { class: "calendar" }, ie = { class: "weekdays" }, ue = { class: "days" }, ye = ["onClick"], ve = {
   key: 0,
   class: "selected-indicator"
-}, ge = { class: "dialog-footer" }, fe = "120px", pe = {
+}, fe = { class: "dialog-footer" }, he = "120px", ge = {
   __name: "AnnualCalendar",
   props: {
     // 初始年份
@@ -52,26 +52,26 @@ const ae = (o, p) => {
     }
   },
   emits: ["update:year", "holiday-change", "year-change"],
-  setup(o, { expose: p, emit: s }) {
-    const i = o, y = s, v = w(!1), d = w([]), l = w({
+  setup(o, { expose: g, emit: s }) {
+    const c = o, y = s, v = w(!1), r = w([]), l = w({
       year: "",
       days: []
-    }), g = w({
+    }), f = w({
       dateRange: []
-    }), V = ["日", "一", "二", "三", "四", "五", "六"], I = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], F = w([
-      { value: "1", label: "周一休息" },
-      { value: "2", label: "周二休息" },
-      { value: "3", label: "周三休息" },
-      { value: "4", label: "周四休息" },
-      { value: "5", label: "周五休息" },
-      { value: "6", label: "周六休息" },
-      { value: "0", label: "周日休息" }
-    ]), N = P(() => l.value.days.filter((e) => e.isHoliday).map((e) => e.date)), j = (e) => {
-      const t = [], c = new Date(l.value.year, e - 1, 1), u = new Date(l.value.year, e, 0), _ = c.getDay(), C = new Date(l.value.year, e - 1, 0).getDate();
-      for (let a = _ - 1; a >= 0; a--) {
-        const n = new Date(l.value.year, e - 2, C - a);
+    }), I = ["日", "一", "二", "三", "四", "五", "六"], E = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], C = w([
+      { value: "1", label: "周一休息", checked: !1 },
+      { value: "2", label: "周二休息", checked: !1 },
+      { value: "3", label: "周三休息", checked: !1 },
+      { value: "4", label: "周四休息", checked: !1 },
+      { value: "5", label: "周五休息", checked: !1 },
+      { value: "6", label: "周六休息", checked: !1 },
+      { value: "0", label: "周日休息", checked: !1 }
+    ]), N = P(() => l.value.days.filter((e) => e.isHoliday).map((e) => e.date)), W = (e) => {
+      const t = [], i = new Date(l.value.year, e - 1, 1), u = new Date(l.value.year, e, 0), p = i.getDay(), H = new Date(l.value.year, e - 1, 0).getDate();
+      for (let a = p - 1; a >= 0; a--) {
+        const n = new Date(l.value.year, e - 2, H - a);
         t.push({
-          day: C - a,
+          day: H - a,
           date: n,
           isCurrentMonth: !1
         });
@@ -95,68 +95,72 @@ const ae = (o, p) => {
         });
       }
       return t;
-    }, T = (e) => {
+    }, j = (e) => {
       const t = /* @__PURE__ */ new Date();
       return e.getDate() === t.getDate() && e.getMonth() === t.getMonth() && e.getFullYear() === t.getFullYear();
-    }, U = (e) => {
+    }, T = (e) => {
       e.isCurrentMonth && (l.value.days[e.keyId].isHoliday = !l.value.days[e.keyId].isHoliday, b());
     }, z = (e, t) => {
-      l.value.days.forEach((c) => {
-        c.weekday == t && (c.isHoliday = e);
+      l.value.days.forEach((i) => {
+        i.weekday == t && (i.isHoliday = e);
       }), b();
     }, q = () => {
       v.value = !0;
     }, G = (e) => e.getFullYear() != l.value.year, J = () => {
-      if (g.value.dateRange.length !== 2) {
+      if (f.value.dateRange.length !== 2) {
         B.error("请选择日期范围");
         return;
       }
-      const [e, t] = g.value.dateRange, c = S(e) - 1, u = S(t) - 1;
-      for (let _ = c; _ <= u; _++)
-        l.value.days[_].isHoliday = !0;
+      const [e, t] = f.value.dateRange, i = S(e) - 1, u = S(t) - 1;
+      for (let p = i; p <= u; p++)
+        l.value.days[p].isHoliday = !0;
       v.value = !1, b(), B.success("批量设置休息日成功");
     }, b = () => {
       y("holiday-change", N.value);
-    }, E = (e) => {
-      l.value.year = e, l.value = te(e), g.value.dateRange = [new Date(e, 0, 1), new Date(e, 0, 1)], d.value = [], y("year-change", e), b(), B.success(`已切换到 ${e} 年`);
+    }, F = (e) => {
+      l.value.year = e, l.value = te(e), f.value.dateRange = [new Date(e, 0, 1), new Date(e, 0, 1)], r.value = [], y("year-change", e), b(), B.success(`已切换到 ${e} 年`);
     }, O = (e) => {
       l.value.days.forEach((t) => {
         t.isHoliday = !1;
       }), e.forEach((t) => {
-        const c = new Date(t), u = S(c) - 1;
+        const i = new Date(t), u = S(i) - 1;
         l.value.days[u] && (l.value.days[u].isHoliday = !0);
       }), b();
     };
-    return W(
-      () => i.year,
+    return U(
+      () => c.year,
       (e) => {
-        e !== l.value.year && E(e);
+        e !== l.value.year && (F(e), C.value.forEach((t) => {
+          t.checked = !1;
+        }));
       }
-    ), W(
-      () => i.initialHolidays,
+    ), U(
+      () => c.initialHolidays,
       (e) => {
         e && e.length > 0 && O(e);
       },
       { immediate: !0 }
-    ), p({
-      loadNewYear: E,
+    ), g({
+      loadNewYear: F,
       setHolidays: O,
       getSelectedHolidays: () => N.value,
       getHolidayData: () => l.value
     }), Q(() => {
-      E(i.year);
+      F(c.year);
     }), (e, t) => {
-      const c = k("el-checkbox"), u = k("el-button"), _ = k("el-date-picker"), C = k("el-form-item"), R = k("el-form"), $ = k("el-dialog");
-      return f(), h("div", le, [
-        r("div", ne, [
-          t[6] || (t[6] = r("h3", null, "批量选择休息日", -1)),
-          r("div", oe, [
-            r("div", se, [
-              (f(!0), h(H, null, x(F.value, (a) => (f(), X(c, {
+      const i = k("el-checkbox"), u = k("el-button"), p = k("el-date-picker"), H = k("el-form-item"), R = k("el-form"), $ = k("el-dialog");
+      return h(), _("div", le, [
+        d("div", ne, [
+          t[6] || (t[6] = d("h3", null, "批量选择休息日", -1)),
+          d("div", oe, [
+            d("div", se, [
+              (h(!0), _(x, null, M(C.value, (a) => (h(), X(i, {
                 key: a.value,
                 label: a.label,
-                onChange: (n) => z(n, a.value)
-              }, null, 8, ["label", "onChange"]))), 128))
+                onChange: (n) => z(n, a.value),
+                modelValue: a.checked,
+                "onUpdate:modelValue": (n) => a.checked = n
+              }, null, 8, ["label", "onChange", "modelValue", "onUpdate:modelValue"]))), 128))
             ]),
             m(u, {
               link: "",
@@ -164,36 +168,36 @@ const ae = (o, p) => {
               onClick: t[0] || (t[0] = (a) => q())
             }, {
               default: D(() => [...t[5] || (t[5] = [
-                M(" 批量设置休息日 ", -1)
+                V(" 批量设置休息日 ", -1)
               ])]),
               _: 1
             })
           ])
         ]),
-        r("div", re, [
-          (f(), h(H, null, x(I, (a) => r("div", {
+        d("div", de, [
+          (h(), _(x, null, M(E, (a) => d("div", {
             key: a,
             class: "month-card"
           }, [
-            r("div", de, Y(l.value.year) + "年 " + Y(a) + "月", 1),
-            r("div", ie, [
-              r("div", ce, [
-                (f(), h(H, null, x(V, (n) => r("div", { key: n }, Y(n), 1)), 64))
+            d("div", re, Y(l.value.year) + "年 " + Y(a) + "月", 1),
+            d("div", ce, [
+              d("div", ie, [
+                (h(), _(x, null, M(I, (n) => d("div", { key: n }, Y(n), 1)), 64))
               ]),
-              r("div", ue, [
-                (f(!0), h(H, null, x(j(a), (n, K) => {
+              d("div", ue, [
+                (h(!0), _(x, null, M(W(a), (n, K) => {
                   var A, L;
-                  return f(), h("div", {
+                  return h(), _("div", {
                     key: K,
                     class: Z(["day", {
                       "other-month": !n.isCurrentMonth,
                       selected: (A = l.value.days[n.keyId]) == null ? void 0 : A.isHoliday,
-                      today: T(n.date)
+                      today: j(n.date)
                     }]),
-                    onClick: (he) => U(n)
+                    onClick: (_e) => T(n)
                   }, [
-                    M(Y(n.isCurrentMonth ? n.day : "") + " ", 1),
-                    (L = l.value.days[n.keyId]) != null && L.isHoliday ? (f(), h("div", ve, "休")) : ee("", !0)
+                    V(Y(n.isCurrentMonth ? n.day : "") + " ", 1),
+                    (L = l.value.days[n.keyId]) != null && L.isHoliday ? (h(), _("div", ve, "休")) : ee("", !0)
                   ], 10, ye);
                 }), 128))
               ])
@@ -207,12 +211,12 @@ const ae = (o, p) => {
           width: "500"
         }, {
           footer: D(() => [
-            r("div", ge, [
+            d("div", fe, [
               m(u, {
                 onClick: t[2] || (t[2] = (a) => v.value = !1)
               }, {
                 default: D(() => [...t[7] || (t[7] = [
-                  M("取消", -1)
+                  V("取消", -1)
                 ])]),
                 _: 1
               }),
@@ -221,23 +225,23 @@ const ae = (o, p) => {
                 onClick: t[3] || (t[3] = (a) => J())
               }, {
                 default: D(() => [...t[8] || (t[8] = [
-                  M("确认", -1)
+                  V("确认", -1)
                 ])]),
                 _: 1
               })
             ])
           ]),
           default: D(() => [
-            m(R, { model: g.value }, {
+            m(R, { model: f.value }, {
               default: D(() => [
-                m(C, {
+                m(H, {
                   label: "日期范围",
-                  "label-width": fe
+                  "label-width": he
                 }, {
                   default: D(() => [
-                    m(_, {
-                      modelValue: g.value.dateRange,
-                      "onUpdate:modelValue": t[1] || (t[1] = (a) => g.value.dateRange = a),
+                    m(p, {
+                      modelValue: f.value.dateRange,
+                      "onUpdate:modelValue": t[1] || (t[1] = (a) => f.value.dateRange = a),
                       type: "daterange",
                       "disabled-date": G,
                       "range-separator": "至",
@@ -256,12 +260,12 @@ const ae = (o, p) => {
       ]);
     };
   }
-}, _e = /* @__PURE__ */ ae(pe, [["__scopeId", "data-v-cbea903a"]]), ke = {
+}, pe = /* @__PURE__ */ ae(ge, [["__scopeId", "data-v-f255a51b"]]), ke = {
   install(o) {
-    o.component("AnnualCalendar", _e);
+    o.component("AnnualCalendar", pe);
   }
 };
 export {
-  _e as AnnualCalendar,
+  pe as AnnualCalendar,
   ke as default
 };
