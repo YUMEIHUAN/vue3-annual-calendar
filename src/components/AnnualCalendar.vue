@@ -5,7 +5,7 @@
       <div style="display: flex; justify-content: space-between">
         <div class="weekday-checkboxes">
           <el-checkbox v-for="day in weekdayChecbox" :key="day.value" :label="day.label"
-            @change="handleWeekdayChange($event, day.value)" />
+            @change="handleWeekdayChange($event, day.value)" v-model="day.checked" />
         </div>
         <el-button link type="primary" @click="batchSetHoliday()"> 批量设置休息日 </el-button>
       </div>
@@ -93,13 +93,13 @@ const form = ref({
 const weekdays = ['日', '一', '二', '三', '四', '五', '六']
 const months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 const weekdayChecbox = ref([
-  { value: '1', label: '周一休息' },
-  { value: '2', label: '周二休息' },
-  { value: '3', label: '周三休息' },
-  { value: '4', label: '周四休息' },
-  { value: '5', label: '周五休息' },
-  { value: '6', label: '周六休息' },
-  { value: '0', label: '周日休息' },
+  { value: '1', label: '周一休息', checked: false },
+  { value: '2', label: '周二休息', checked: false },
+  { value: '3', label: '周三休息', checked: false },
+  { value: '4', label: '周四休息', checked: false },
+  { value: '5', label: '周五休息', checked: false },
+  { value: '6', label: '周六休息', checked: false },
+  { value: '0', label: '周日休息', checked: false },
 ])
 
 // 计算属性：获取当前选择的休息日
@@ -248,6 +248,9 @@ watch(
   (newYear) => {
     if (newYear !== holidayData.value.year) {
       loadNewYear(newYear)
+      weekdayChecbox.value.forEach((item) => {
+        item.checked = false
+      })
     }
   },
 )
